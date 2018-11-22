@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { react2angular } from 'react2angular';
-import { BigMessage } from './BigMessage.jsx';
+import { BigMessage } from './BigMessage';
 
 function NoTaggedObjectsFound({ objectType, tags }) {
   return (
@@ -24,3 +24,5 @@ NoTaggedObjectsFound.propTypes = {
 export default function init(ngModule) {
   ngModule.component('noTaggedObjectsFound', react2angular(NoTaggedObjectsFound));
 }
+
+init.init = true;
