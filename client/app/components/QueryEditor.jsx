@@ -86,6 +86,8 @@ class QueryEditor extends React.Component {
       keywords: [], // eslint-disable-line react/no-unused-state
       autocompleteQuery: localOptions.get('liveAutocomplete', true),
       liveAutocompleteDisabled: false,
+      // XXX temporary while interfacing with angular
+      queryText: props.queryText,
     };
     langTools.addCompleter({
       getCompletions: (state, session, pos, prefix, callback) => {
@@ -141,7 +143,7 @@ class QueryEditor extends React.Component {
       // eslint-disable-next-line react/prop-types
       const format = this.props.Query.format;
       format(this.props.dataSource.syntax || 'sql', this.props.queryText)
-        .then(this.props.updateQuery)
+        .then(this.updateQuery)
         .catch(error => toastr.error(error));
     };
   }
@@ -160,6 +162,11 @@ class QueryEditor extends React.Component {
     return null;
   }
 
+  updateQuery = (queryText) => {
+    this.props.updateQuery(queryText);
+    this.setState({ queryText });
+  };
+
   toggleAutocomplete = (state) => {
     this.setState({ autocompleteQuery: state });
     localOptions.set('liveAutocomplete', state);
@@ -172,14 +179,14 @@ class QueryEditor extends React.Component {
     const isExecuteDisabled = this.props.queryExecuting || !this.props.canExecuteQuery();
 
     return (
-      <section style={{ height: '100%' }}>
+      <section style={{ height: '100%' }} data-test="QueryEditor">
         <div className="container p-15 m-b-10" style={{ height: '100%' }}>
           <div style={{ height: 'calc(100% - 40px)', marginBottom: '0px' }} className="editor__container">
             <AceEditor
               ref={this.refEditor}
               theme="textmate"
               mode={this.props.dataSource.syntax || 'sql'}
-              value={this.props.queryText}
+              value={this.state.queryText}
               editorProps={{ $blockScrolling: Infinity }}
               width="100%"
               height="100%"
@@ -194,9 +201,7 @@ class QueryEditor extends React.Component {
               wrapEnabled={false}
               onLoad={this.onLoad}
               onPaste={this.onPaste}
-              onChange={(queryText) => {
-                this.props.updateQuery(queryText);
-              }}
+              onChange={this.updateQuery}
             />
           </div>
 
@@ -257,6 +262,7 @@ class QueryEditor extends React.Component {
                   className={'btn btn-primary m-l-5' + (isExecuteDisabled ? ' disabled' : '')}
                   disabled={isExecuteDisabled}
                   onClick={this.props.executeQuery}
+                  data-test="ExecuteButton"
                 >
                   <span className="zmdi zmdi-play" />
                   <span className="hidden-xs m-l-5">Execute</span>
