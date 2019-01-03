@@ -1,5 +1,12 @@
 FROM redash/base:latest
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libboost-all-dev \
+    unixodbc-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Controls whether to install extra dependencies needed for all data sources.
 ARG skip_ds_deps
 

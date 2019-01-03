@@ -30,3 +30,5 @@ certifi
 # other packages. To properly support it we probably need to switch from pyOpenSSL
 # to the other package snowflake is using (that's compatible with it).
 # snowflake_connector_python==1.6.10
+numpy==1.15.4
+turbodbc==3.0.0
