@@ -9,6 +9,13 @@ RUN npm run build
 
 FROM redash/base:latest
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libboost-all-dev \
+    unixodbc-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Controls whether to install extra dependencies needed for all data sources.
 ARG skip_ds_deps
 
@@ -22,6 +29,8 @@ COPY . /app
 COPY --from=frontend-builder /frontend/client/dist /app/client/dist
 RUN chown -R redash /app
 USER redash
+
+COPY exasol_odbc/ /etc/
 
 ENTRYPOINT ["/app/bin/docker-entrypoint"]
 CMD ["server"]
