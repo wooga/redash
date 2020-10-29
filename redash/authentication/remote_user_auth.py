@@ -26,6 +26,7 @@ def login(org_slug=None):
         return redirect(url_for("redash.index", next=next_path, org_slug=org_slug))
 
     email = request.headers.get(settings.REMOTE_USER_HEADER)
+    name = extract_name(email)
 
     # Some Apache auth configurations will, stupidly, set (null) instead of a
     # falsey value.  Special case that here so it Just Works for more installs.
@@ -44,8 +45,18 @@ def login(org_slug=None):
 
     logger.info("Logging in " + email + " via remote user")
 
-    user = create_and_login_user(current_org, email, email)
+    user = create_and_login_user(current_org, name, email)
     if user is None:
         return logout_and_redirect_to_index()
 
     return redirect(next_path or url_for("redash.index", org_slug=org_slug), code=302)
+
+
+def extract_name(email):
+    name = email.rpartition('@')[0]
+    domain = email.rpartition('@')[2]
+    if domain == 'wooga.net':
+        name = name.replace(".", " ")
+    elif domain == 'playtika.com':
+        name = name[0:-1] + ' ' + name[-1]
+    return name.title()
