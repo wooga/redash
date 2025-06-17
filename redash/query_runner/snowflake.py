@@ -91,11 +91,11 @@ class Snowflake(BaseSQLQueryRunner):
         return enabled
 
     @classmethod
-    def determine_type(cls, data_type, scale):
+    def determine_type(cls, data_type, precision, scale):
         t = TYPES_MAP.get(data_type, None)
         if t == TYPE_INTEGER and scale > 0:
             return TYPE_FLOAT
-        elif t == TYPE_INTEGER:
+        elif t == TYPE_INTEGER and precision >= 16:
             return TYPE_STRING
         else:
             return t
