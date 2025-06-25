@@ -14,7 +14,7 @@ readme = "README.md"
 dependencies = []
 
 [tool.black]
-target-version = ['py38']
+target-version = ['py39']
 line-length = 119
 force-exclude = '''
 /(
@@ -137,7 +137,7 @@ python-rapidjson = "1.20"
 requests-aws-sign = "0.1.5"
 sasl = ">=0.4a1"
 simple-salesforce = "0.74.3"
-snowflake-connector-python = "3.12.3"
+snowflake-connector-python = "~=3.15.0"
 td-client = "1.5.0"
 thrift = ">=0.8.0"
 thrift-sasl = ">=0.1.0"
