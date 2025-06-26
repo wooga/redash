@@ -32,6 +32,15 @@ TYPES_MAP = {
 }
 
 
+def is_large_integer(data_type, precision, scale):
+    """
+    Checks if the column type is NUMBER(38,0) to avoid integer overflow.
+    """
+    if data_type == 0 and precision == 38 and scale == 0:
+        return True
+    return False
+
+
 class Snowflake(BaseSQLQueryRunner):
     noop_query = "SELECT 1"
 
@@ -141,13 +150,23 @@ class Snowflake(BaseSQLQueryRunner):
         return column_name
 
     def _parse_results(self, cursor):
+        rows = []
+        for row in cursor:
+            row_dict = {}
+            for column, value in zip(cursor.description, row):
+                column_name = self._column_name(column[0])
+                if is_large_integer(column[1], column[4], column[5]):
+                    row_dict[column_name] = str(value)  # Cast INT to STRING
+                else:
+                    row_dict[column_name] = value
+            rows.append(row_dict)
+
         columns = self.fetch_columns(
             [(self._column_name(i[0]), self.determine_type(i[1], i[4], i[5])) for i in cursor.description]
         )
-        rows = [dict(zip((column["name"] for column in columns), row)) for row in cursor]
 
-       data = {"columns": columns, "rows": rows}
-       return data
+        data = {"columns": columns, "rows": rows}
+        return data
 
     def run_query(self, query, user):
         connection = self._get_connection()
