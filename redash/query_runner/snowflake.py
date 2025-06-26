@@ -35,15 +35,6 @@ TYPES_MAP = {
 }
 
 
-def is_large_integer(data_type, precision, scale):
-    """
-    Checks if the column type is NUMBER(38,0) to avoid integer overflow.
-    """
-    if data_type == 0 and precision == 38 and scale == 0:
-        return True
-    return False
-
-
 class Snowflake(BaseSQLQueryRunner):
     noop_query = "SELECT 1"
 
@@ -100,11 +91,11 @@ class Snowflake(BaseSQLQueryRunner):
         return enabled
 
     @classmethod
-    def determine_type(cls, data_type, precision, scale):
+    def determine_type(cls, data_type, scale):
         t = TYPES_MAP.get(data_type, None)
         if t == TYPE_INTEGER and scale > 0:
             return TYPE_FLOAT
-        elif t == TYPE_INTEGER and precision == 38:
+        elif t == TYPE_INTEGER:
             return TYPE_STRING
         else:
             return t
