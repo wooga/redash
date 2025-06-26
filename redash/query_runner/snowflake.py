@@ -95,7 +95,7 @@ class Snowflake(BaseSQLQueryRunner):
         t = TYPES_MAP.get(data_type, None)
         if t == TYPE_INTEGER and scale > 0:
             return TYPE_FLOAT
-        elif t == TYPE_INTEGER and precision >= 16:
+        elif t == TYPE_INTEGER and precision == 38:
             return TYPE_STRING
         else:
             return t
