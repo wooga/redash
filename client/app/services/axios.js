@@ -4,7 +4,7 @@ import createAuthRefreshInterceptor from "axios-auth-refresh";
 import { Auth } from "@/services/auth";
 import qs from "query-string";
 import { restoreSession } from "@/services/restoreSession";
-import { JSONParse } from "json-with-bigint/json-with-bigint.js";
+import { JSONParse } from "json-with-bigint";
 
 export const axios = axiosLib.create({
   paramsSerializer: params => qs.stringify(params),
