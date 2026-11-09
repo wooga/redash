@@ -146,6 +146,17 @@ class Snowflake(BaseSQLQueryRunner):
         data = {"columns": columns, "rows": rows}
         return data
 
+    def annotate_query(self, query, metadata):
+        comment = super().annotate_query("", metadata).strip()
+        if not comment:
+            return query
+
+        stripped = query.rstrip()
+        if stripped.endswith(";"):
+            return "{}\n{};".format(stripped[:-1].rstrip(), comment)
+
+        return "{}\n{}".format(stripped, comment)
+
     def run_query(self, query, user):
         connection = self._get_connection()
         cursor = connection.cursor()

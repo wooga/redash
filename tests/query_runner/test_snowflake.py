@@ -291,3 +291,29 @@ class TestGetSchema(TestCase):
         _, cursor = self._get_schema("db.public", [])
 
         self.assertEqual(["USE db.public", "SHOW COLUMNS"], cursor.executed)
+
+
+class TestAnnotateQuery(TestCase):
+    def setUp(self):
+        self.runner = Snowflake({})
+
+    def test_appends_annotation_at_tail_of_query(self):
+        annotated = self.runner.annotate_query("SELECT * FROM t", {"user_id": 42, "query_id": 7})
+
+        self.assertEqual("SELECT * FROM t\n/* user_id: 42, query_id: 7 */", annotated)
+
+    def test_places_annotation_before_trailing_semicolon(self):
+        annotated = self.runner.annotate_query("SELECT * FROM t;  \n", {"user_id": 42, "query_id": "adhoc"})
+
+        self.assertEqual("SELECT * FROM t\n/* user_id: 42, query_id: adhoc */;", annotated)
+
+    def test_leaves_query_unchanged_when_no_valid_metadata(self):
+        self.assertEqual("SELECT * FROM t", self.runner.annotate_query("SELECT * FROM t", {}))
+
+    def test_leaves_query_unchanged_when_annotations_disabled(self):
+        self.runner.should_annotate_query = False
+
+        self.assertEqual(
+            "SELECT * FROM t",
+            self.runner.annotate_query("SELECT * FROM t", {"user_id": 42, "query_id": 7}),
+        )
